@@ -1,9 +1,9 @@
 const cacheName = "null-Clustering-0.1";
 const contentToCache = [
     "Build/clustering.loader.js",
-    "Build/clustering.framework.js.gz",
-    "Build/clustering.data.gz",
-    "Build/clustering.wasm.gz",
+    "Build/clustering.framework.js",
+    "Build/clustering.data",
+    "Build/clustering.wasm",
     "TemplateData/style.css"
 
 ];
