@@ -18,6 +18,7 @@ public class Clustering : MonoBehaviour
     [SerializeField]private GameObject center;
     [SerializeField]private List<UnityEngine.Color> color;
     [SerializeField]private float maxTimeToAddPoint = 0.3f;
+    [SerializeField]private animationController animi;
     private float lastPressTime = 0;
     private static List<Transform> points = new List<Transform>();
     private static List<Cluster> clusters = new List<Cluster>();
@@ -50,7 +51,8 @@ public class Clustering : MonoBehaviour
         points.Add(Instantiate(point, cam.ScreenToWorldPoint(Input.mousePosition)+new Vector3(0,0,10), Quaternion.identity).transform);
     }
     public static void deletePoint(GameObject g) {
-        points.Remove(g.transform);
+            
+            points.Remove(g.transform);
     }
 
     float distance(Vector3 t1, Vector3 t2) {
@@ -108,12 +110,19 @@ public class Clustering : MonoBehaviour
     }
 
     public void destroyAllPoints() {
-        if (isCalculating)
+        if (isCalculating) {
+            notification.add("you cant delete right now!");
             return;
+        }
+           
         foreach (Transform t in points) { 
             Destroy (t.gameObject);
         }
         points.Clear();
+        GameObject[] gg = GameObject.FindGameObjectsWithTag("center");
+        foreach (GameObject g in gg)
+            g.SetActive(false);
+
     }
 
 
@@ -166,10 +175,15 @@ public class Clustering : MonoBehaviour
 
 
     public void KMean() {
-        if (isCalculating)
-            return; // well be notification soon
+        if (isCalculating) {
+            notification.add("already started!");
+            return;
+        }
         if (points.Count <= k)
-            return; // well be notification soon
+        {
+            notification.add("you have to add " + (k+1-points.Count) + " points");
+            return;
+        }
         StartCoroutine(kMean(k));
     }
     IEnumerator kMean(int k) {
@@ -181,7 +195,7 @@ public class Clustering : MonoBehaviour
                 yield return null;
             }
 
-
+            animi.Close();
             destroyTransform(clusters);
             clusters = new List<Cluster>();
             List<Vector3> newCenters = new List<Vector3>();
@@ -237,8 +251,8 @@ public class Clustering : MonoBehaviour
                 //Debug.Log("Clusters:" + clusters[0] +"\titeration:"+iteration+ "\tcenters:" + centers.Count  );
                 //newClusters = new List<Cluster>();
             }
-
-            isCalculating = false;
+        animi.Open();
+        isCalculating = false;
         
 
     }

@@ -100,7 +100,7 @@ public class PeformenceManger : MonoBehaviour
         lastActive = Time.time;
         Application.targetFrameRate = activeFPS == 0? Screen.currentResolution.refreshRate : activeFPS;
         ScalableBufferManager.ResizeBuffers(activeBufferManger, activeBufferManger);
-        Physics.autoSimulation = Physics2D.autoSimulation = activePhysicsAutoSimulate;
+        //Physics.simulationMode = Physics2D.simulationMode = activePhysicsAutoSimulate ;
         Physics.defaultSolverIterations = Physics2D.velocityIterations = activePhysicsIterations;
     }
 
@@ -113,14 +113,14 @@ public class PeformenceManger : MonoBehaviour
         {
             Application.targetFrameRate = idleFPS == 0 ? Screen.currentResolution.refreshRate : idleFPS;
             ScalableBufferManager.ResizeBuffers(idleBufferManger, idleBufferManger);
-            Physics.autoSimulation = Physics2D.autoSimulation = idlePhysicsAutoSimulate;
+            //Physics.autoSimulation = Physics2D.autoSimulation = idlePhysicsAutoSimulate;
             Physics.defaultSolverIterations = Physics2D.velocityIterations = idlePhysicsIterations;
         }
 
         else { // not fouced state
             Application.targetFrameRate = notFocusedFPS == 0 ? Screen.currentResolution.refreshRate : notFocusedFPS;
             ScalableBufferManager.ResizeBuffers(notFocusedBufferManger, notFocusedBufferManger);
-            Physics.autoSimulation = Physics2D.autoSimulation = notFocusedPhysicsAutoSimulate;
+            //Physics.autoSimulation = Physics2D.autoSimulation = notFocusedPhysicsAutoSimulate;
             Physics.defaultSolverIterations = Physics2D.velocityIterations = notFocusedPhysicsIterations;
         }
             
