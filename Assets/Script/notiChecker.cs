@@ -1,7 +1,6 @@
 ﻿
 using System.Collections;
 using UnityEngine;
-using TMPro;
 
 
 class notiChecker : MonoBehaviour
@@ -17,7 +16,7 @@ class notiChecker : MonoBehaviour
     IEnumerator check()
     {
 
-        while (true)
+        while (true) // check if there is notification to show it
         {
 
             yield return new WaitForSeconds(0.5f);

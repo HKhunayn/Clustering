@@ -45,14 +45,14 @@ public class Clustering : MonoBehaviour
     }
 
     private void addPoint() {
-
+        if (camManger.isMovingAndLeftClick)
+            return;
         if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() || points.Count >= maxPoints)
             return;
         points.Add(Instantiate(point, cam.ScreenToWorldPoint(Input.mousePosition)+new Vector3(0,0,10), Quaternion.identity).transform);
     }
     public static void deletePoint(GameObject g) {
-            
-            points.Remove(g.transform);
+        points.Remove(g.transform);
     }
 
     float distance(Vector3 t1, Vector3 t2) {
@@ -126,6 +126,7 @@ public class Clustering : MonoBehaviour
     }
 
 
+    // -----------------------( for buttons controling )-----------------------
     public void increaseK()
     {
         k++;
@@ -170,11 +171,12 @@ public class Clustering : MonoBehaviour
         textIterations.text = maxIterations + "";
         textDelay.text =  delay.ToString("F1");
     }
+    // ------------------------------------------------------------------------
+
+
 
     bool isCalculating = false;
-
-
-    public void KMean() {
+    public void KMean() { // if its follows the rules then call KMean and start visualizing
         if (isCalculating) {
             notification.add("already started!");
             return;
@@ -195,7 +197,7 @@ public class Clustering : MonoBehaviour
                 yield return null;
             }
 
-            animi.Close();
+            animi.Close(); // hide the leftside menu
             destroyTransform(clusters);
             clusters = new List<Cluster>();
             List<Vector3> newCenters = new List<Vector3>();
@@ -205,7 +207,7 @@ public class Clustering : MonoBehaviour
                 
                 int x = UnityEngine.Random.Range(0, points.Count-1);
                 
-                while (usedIndex.Contains(x))
+                while (usedIndex.Contains(x)) // make sure that there is no duplicated point chosen as started point
                     x = UnityEngine.Random.Range(0, points.Count - 1);
                 usedIndex.Add(x);
                 newCenters.Add(points[x].transform.position);
@@ -221,8 +223,8 @@ public class Clustering : MonoBehaviour
                 iteration++;
                 yield return new WaitForSecondsRealtime(delay);
 
-                foreach (Transform g in points)
-                {
+                foreach (Transform g in points) // determine the points to the nearest cluster
+            {
                     Cluster nearest = clusters[0];
                     for (int i = 1; i < k; i++)
                     {
@@ -234,7 +236,7 @@ public class Clustering : MonoBehaviour
 
                 centers = newCenters;
                 newCenters = new List<Vector3>();
-                for (int i=0;i<clusters.Count; i++)
+                for (int i=0;i<clusters.Count; i++) // calculate the new centers
                 {
                     Vector3 total = Vector3.zero;
                     foreach (Transform t in clusters[i].getPoints())
@@ -248,10 +250,9 @@ public class Clustering : MonoBehaviour
                     clusters[i].getPoints().Clear();
                     ;
                 }
-                //Debug.Log("Clusters:" + clusters[0] +"\titeration:"+iteration+ "\tcenters:" + centers.Count  );
-                //newClusters = new List<Cluster>();
+
             }
-        animi.Open();
+        animi.Open(); // showing the leftside menu
         isCalculating = false;
         
 

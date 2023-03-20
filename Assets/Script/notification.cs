@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +16,7 @@ public class notification : MonoBehaviour
         disable();
         
     }
-    public static void add(string text) { 
+    public static void add(string text) { // method to recive notifications as string
         remainingString.Add(text);
         notiText.text = text;
         notificationObject.gameObject.SetActive(true);

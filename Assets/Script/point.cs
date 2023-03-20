@@ -1,10 +1,8 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class point : MonoBehaviour
 {
-    [SerializeField]bool isMoving = false;
     [SerializeField] Camera cam;
 
     private void Start()
@@ -20,13 +18,12 @@ public class point : MonoBehaviour
 
     private void OnMouseDrag()
     {
-        isMoving = Clustering.inMoving = true;
+        Clustering.inMoving = true;
         transform.position = cam.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10);
     }
     private void OnMouseUp()
     {
         StartCoroutine(stoppedMoving());
-        /*isMoving = Clustering.inMoving = false;*/
     }
     void OnMouseOver()
     {
@@ -40,6 +37,6 @@ public class point : MonoBehaviour
     IEnumerator stoppedMoving() {
 
         yield return new WaitForEndOfFrame();
-        isMoving = Clustering.inMoving = false;
+        Clustering.inMoving = false;
     }
 }
