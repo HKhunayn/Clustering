@@ -11,9 +11,10 @@ public class camManger : MonoBehaviour
     [SerializeField] Clustering clustering;
     Vector3 initialCameraPos;
     private Vector3 lastPos;
-    private float lastTimeLeftClick = 1f;
+    public static float lastTimeLeftClick = 1f;
     public static Vector3 firstCamPos;
     public static bool isMovingAndLeftClick = false;
+    private float lastLeftClick = 0f;
     void Start()
     {
         cam = gameObject.GetComponent<Camera>();
@@ -37,6 +38,9 @@ public class camManger : MonoBehaviour
             changeZoom();
         if (Input.GetMouseButtonDown(0))
             lastTimeLeftClick = Time.time;
+        
+        if (Input.GetMouseButton(0))
+            lastLeftClick = Time.time;
     }
 
     private void LateUpdate()
@@ -45,14 +49,14 @@ public class camManger : MonoBehaviour
             StartCoroutine(setFalse());
     }
     IEnumerator setFalse() {
-        yield return new WaitForFixedUpdate();
+        yield return new WaitForSecondsRealtime(0.5f);
         isMovingAndLeftClick = false;
     }
     void showCenteringButton(){
         centeringButton.SetActive(true);
     }
     private void changeLoc() {
-        if (Time.time - lastTimeLeftClick < 0.2f)
+        if (Time.time - lastTimeLeftClick < 0.2f || Time.time -  lastLeftClick > 0.2f)
             return;
         if (!isMovingAndLeftClick)
             firstCamPos = cam.transform.position;
@@ -78,8 +82,12 @@ public class camManger : MonoBehaviour
     public void centeringCam()
     {
         cam.transform.position  =  initialCameraPos;
-        centeringButton.SetActive(false);
+        StartCoroutine(hideCenterButton());
     }
 
+    IEnumerator hideCenterButton() { // to fix the adding points behond the button
+        yield return new WaitForEndOfFrame();
+        centeringButton.SetActive(false);
+    }
 
 }

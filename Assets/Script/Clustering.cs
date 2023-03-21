@@ -18,6 +18,8 @@ public class Clustering : MonoBehaviour
     [SerializeField]private GameObject center;
     [SerializeField]private List<UnityEngine.Color> color;
     [SerializeField]private float maxTimeToAddPoint = 0.3f;
+    [SerializeField]private GameObject startButton;
+    [SerializeField]private GameObject stopButton;
     [SerializeField]private animationController animi;
     private float lastPressTime = 0;
     private static List<Transform> points = new List<Transform>();
@@ -33,21 +35,21 @@ public class Clustering : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0)) { 
             lastPressTime = Time.time;
-            
+        
         }
         if (Input.GetMouseButtonUp(0)) { 
-            if (!inMoving && (lastPressTime-Time.time <= maxTimeToAddPoint))
+            if (!inMoving && (Time.time- lastPressTime <= maxTimeToAddPoint))
                 addPoint();
             lastPressTime = Time.time;
-            
+        
         }
 
     }
 
     private void addPoint() {
-        if (camManger.isMovingAndLeftClick)
+        if (camManger.isMovingAndLeftClick || Time.time -  camManger.lastTimeLeftClick > 0.1f) // make it frindly with camera Movement (click to add hold to move camera)
             return;
-        if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() || points.Count >= maxPoints)
+        if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() || points.Count >= maxPoints) // to not be addable with over GUI
             return;
         points.Add(Instantiate(point, cam.ScreenToWorldPoint(Input.mousePosition)+new Vector3(0,0,10), Quaternion.identity).transform);
     }
@@ -129,32 +131,40 @@ public class Clustering : MonoBehaviour
     // -----------------------( for buttons controling )-----------------------
     public void increaseK()
     {
+        if (k > 98)
+            return;
         k++;
         updateText();
     }
 
     public void decreaseK()
     {
-        if (k > 2)
-            k--;
+        if (k == 2)
+            return;
+        k--;
         updateText();
     }
     
     public void increaseIterations()
     {
+        if (maxIterations > 98)
+            return;
         maxIterations++;
         updateText();
     }
 
     public void decreaseIterations()
     {
-        if (maxIterations > 2)
-            maxIterations--;
+        if (maxIterations == 2)
+            return;
+        maxIterations--;
         updateText();
     }
       
     public void increaseDelay()
     {
+        if (delay > 9.8)
+            return;
         delay+=0.1f;
         updateText();
     }
@@ -171,9 +181,20 @@ public class Clustering : MonoBehaviour
         textIterations.text = maxIterations + "";
         textDelay.text =  delay.ToString("F1");
     }
+
+    public void github() { 
+        
+        Application.OpenURL("https://github.com/HKhunayn/Clustering");
+    
+    }
+
     // ------------------------------------------------------------------------
 
+    bool isStop = false;
 
+    public void stop() {
+        isStop = true;
+    }
 
     bool isCalculating = false;
     public void KMean() { // if its follows the rules then call KMean and start visualizing
@@ -183,13 +204,16 @@ public class Clustering : MonoBehaviour
         }
         if (points.Count <= k)
         {
-            notification.add("you have to add " + (k+1-points.Count) + " points");
+            notification.add("add more points");
             return;
         }
         StartCoroutine(kMean(k));
     }
+    
     IEnumerator kMean(int k) {
             isCalculating = true;
+            startButton.SetActive(false);
+            stopButton.SetActive(true);
 
             if (points.Count <= k) {
 
@@ -218,7 +242,7 @@ public class Clustering : MonoBehaviour
             List<Vector3> centers = new List<Vector3>();
             int iteration = 0;
             
-            while (!isEqual(centers, newCenters) && iteration < maxIterations)
+            while (!isEqual(centers, newCenters) && iteration < maxIterations && !isStop)
             {
                 iteration++;
                 yield return new WaitForSecondsRealtime(delay);
@@ -253,8 +277,9 @@ public class Clustering : MonoBehaviour
 
             }
         animi.Open(); // showing the leftside menu
-        isCalculating = false;
-        
+        isCalculating = isStop = false;
+        startButton.SetActive(true);
+        stopButton.SetActive(false);
 
     }
 
