@@ -8,7 +8,7 @@
 
       | click left-click to add point | hold left-click to change its location | right-click at any point to remove it |
       | --- | --- | --- |
-      | ![add](https://user-images.githubusercontent.com/102166198/226590171-f36d598a-8a82-4ba3-815f-b936dd1ae35a.gif) |  ![edit](https://user-images.githubusercontent.com/102166198/226590235-153d8c99-2808-494d-bec7-aa7bb1996537.gif) | ![remove](https://user-images.githubusercontent.com/102166198/226590268-b0c62e73-e639-4619-a76d-efa7b2bec36e.gif) |
+      | ![add](https://user-images.githubusercontent.com/102166198/226590171-f36d598a-8a82-4ba3-815f-b936dd1ae35a.gif) | ![edit](https://user-images.githubusercontent.com/102166198/226590235-153d8c99-2808-494d-bec7-aa7bb1996537.gif) | ![remove](https://user-images.githubusercontent.com/102166198/226590268-b0c62e73-e639-4619-a76d-efa7b2bec36e.gif) |
 
 
   3. customize the visulization from the menu at left
