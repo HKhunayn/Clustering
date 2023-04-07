@@ -2,7 +2,7 @@
  simple 2D visualization web application for K-mean ML algorithm that made from scratch using C# with unity.
  
 
-https://user-images.githubusercontent.com/102166198/226624916-a70e7bee-3756-4329-9af6-ecb106df41f7.mp4
+[example](https://user-images.githubusercontent.com/102166198/226624916-a70e7bee-3756-4329-9af6-ecb106df41f7.mp4)
 
 
  ## How to use
