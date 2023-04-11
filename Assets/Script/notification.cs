@@ -20,15 +20,15 @@ public class notification : MonoBehaviour
         remainingString.Add(text);
         notiText.text = text;
         notificationObject.gameObject.SetActive(true);
-        Debug.Log(notificationObject.gameObject);
+        //Debug.Log(notificationObject.gameObject);
     }
 
     public static void active() {
         if (!isActive) {
             isActive = true;
-            if (notification.remainingString.Count > 0) {
-                notiText.text = remainingString.ElementAt(remainingString.Count - 1);
-                remainingString.Remove(remainingString.ElementAt(remainingString.Count - 1));
+            if (notification.remainingString.Count > 0) { // FIFO
+                notiText.text = remainingString.ElementAt(0);
+                remainingString.Remove(remainingString.ElementAt(0));
                 notificationObject.gameObject.SetActive(true);
                 
             }

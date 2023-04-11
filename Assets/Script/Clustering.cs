@@ -53,11 +53,17 @@ public class Clustering : MonoBehaviour
             return;
         points.Add(Instantiate(point, cam.ScreenToWorldPoint(Input.mousePosition)+new Vector3(0,0,10), Quaternion.identity).transform);
     }
-    public static void deletePoint(GameObject g) {
+    public static bool deletePoint(GameObject g) {
+        if (isCalculating)
+        {
+            notification.add("you cant delete right now!");
+            return false;
+        }
         points.Remove(g.transform);
+        return true;
     }
 
-    float distance(Vector3 t1, Vector3 t2) {
+    public static float distance(Vector3 t1, Vector3 t2) {
         return Mathf.Pow(Mathf.Pow(t1.x - t2.x, 2) + Mathf.Pow(t1.y - t2.y, 2), 0.5f);
     }
 
@@ -89,7 +95,7 @@ public class Clustering : MonoBehaviour
             return false;
         for (int i = 0; i < c1.Count; i++)
         {
-            if (c1[i] != c2[i])
+            if (!c2.Contains(c1[i]))
                 return false;
         }
         return true;
@@ -196,7 +202,7 @@ public class Clustering : MonoBehaviour
         isStop = true;
     }
 
-    bool isCalculating = false;
+    static bool isCalculating = false;
     public void KMean() { // if its follows the rules then call KMean and start visualizing
         if (isCalculating) {
             notification.add("already started!");
@@ -241,14 +247,16 @@ public class Clustering : MonoBehaviour
             changeColor(UnityEngine.Color.white);
             List<Vector3> centers = new List<Vector3>();
             int iteration = 0;
-            
+            List<Transform> usedPoints = new List<Transform>(); // a list to store nearest points of each cluster
             while (!isEqual(centers, newCenters) && iteration < maxIterations && !isStop)
             {
                 iteration++;
                 yield return new WaitForSecondsRealtime(delay);
 
                 foreach (Transform g in points) // determine the points to the nearest cluster
-            {
+                {
+                    if (usedPoints.Contains(g)) // to not add the nearest points twice
+                        continue; 
                     Cluster nearest = clusters[0];
                     for (int i = 1; i < k; i++)
                     {
@@ -260,19 +268,20 @@ public class Clustering : MonoBehaviour
 
                 centers = newCenters;
                 newCenters = new List<Vector3>();
+                usedPoints = new List<Transform>(); // reset the points that was the nearest to the cluster
                 for (int i=0;i<clusters.Count; i++) // calculate the new centers
                 {
-                    Vector3 total = Vector3.zero;
-                    foreach (Transform t in clusters[i].getPoints())
-                    {
-                        total += t.position;
-                    }
-                    Vector3 v = total / (clusters[i].getPoints().Count);
+                    Vector3 v = clusters[i].calculateCenter();
 
                     newCenters.Add(v);
+                    Transform nearest = clusters[i].getNearestPoint();// to make sure each clusters has at least one point
+                    usedPoints.Add(nearest);
+
+
+                    clusters[i].clearPoints();
+                    clusters[i].addPoint(nearest);
                     clusters[i].setCenterPos(v);
-                    clusters[i].getPoints().Clear();
-                    ;
+                ;
                 }
 
             }
@@ -290,6 +299,7 @@ class Cluster
     Transform center;
     List<Transform> points;
     UnityEngine.Color color;
+    Transform nearestPoint;
     public Cluster(Transform center, List<Transform> points, UnityEngine.Color color)
     {
         this.center = center;
@@ -300,18 +310,35 @@ class Cluster
 
     public Transform getCenter() { return center; }
     public void setCenter(Transform center) { this.center = center; }
-    public void setCenterPos(Vector3 v) { try { this.center.position = v; } catch (Exception e) { } }
-             
-         
+    public void setCenterPos(Vector3 v) { try { this.center.position = v; } catch (Exception e) { this.center.position = calculateCenter(); } }
+
+
     public List<Transform> getPoints() { return points; }
+    public void clearPoints() { points.Clear(); nearestPoint = null; }
     public void setPoints(List<Transform> points) { this.points = points; }
-    public void addPoint(Transform point) { 
+    public void addPoint(Transform point) {
+        if (nearestPoint == null)
+            nearestPoint = point;
+        else
+            nearestPoint = Clustering.distance(center.position, nearestPoint.position) > Clustering.distance(center.position, point.position) ? point : nearestPoint;
         points.Add(point);
         point.GetComponent<SpriteRenderer>().color = color;
     }
+
+    public Transform getNearestPoint() { return nearestPoint; }
     public UnityEngine.Color getColor() { 
         return color;
     }
+
+    public Vector3 calculateCenter() {
+        Vector3 total = Vector3.zero;
+        foreach (Transform t in points)
+        {
+            total += t.position;
+        }
+        return total/ points.Count;
+    }
+
 
     override public string ToString() {
 
